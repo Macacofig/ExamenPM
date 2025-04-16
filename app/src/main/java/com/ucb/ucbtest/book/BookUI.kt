@@ -15,7 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -34,7 +36,7 @@ fun BookUI(viewModel: BookViewModel = hiltViewModel()) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp),
+            .padding(16.dp),
         contentAlignment = Alignment.TopCenter
     ) {
         Column(
@@ -43,25 +45,30 @@ fun BookUI(viewModel: BookViewModel = hiltViewModel()) {
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Campo de texto
+            // Campo de búsqueda
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
                 value = titulo,
                 onValueChange = { titulo = it },
-                label = { Text("Ingrese el título del libro") }
-            )
-
-            // Botón buscar
-            OutlinedButton(
+                label = { Text("Ingrese el título del libro") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
-                onClick = { viewModel.buscarLibros(titulo) }
+                    .padding(bottom = 12.dp),
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true
+            )
+
+            // Botón de búsqueda
+            OutlinedButton(
+                onClick = { viewModel.buscarLibros(titulo) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text(stringResource(id = R.string.gitalias_btn_find))
+                Text(text = stringResource(id = R.string.gitalias_btn_find))
             }
 
-            // Mensaje de like (si existe)
+            // Mensaje de "like"
             likeMessage?.let { message ->
                 LaunchedEffect(message) {
                     delay(2000)
@@ -69,14 +76,15 @@ fun BookUI(viewModel: BookViewModel = hiltViewModel()) {
                 }
                 Text(
                     text = message,
-                    color = Color.Green,
+                    color = Color(0xFF2E7D32),
                     modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
+                        .padding(vertical = 12.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
                 )
             }
 
-            // Lista de libros
+            // Mostrar libros encontrados
             if (libros.isNotEmpty()) {
                 libros.forEach { libro ->
                     var isLiked by remember { mutableStateOf(false) }
@@ -84,89 +92,94 @@ fun BookUI(viewModel: BookViewModel = hiltViewModel()) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp),
-                        shape = RoundedCornerShape(8.dp),
+                            .padding(vertical = 8.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(6.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFDFDFD))
                     ) {
-                        Column(
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(8.dp)
-                                .background(Color.LightGray)
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = libro.titulo,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 4.dp),
-                                style = TextStyle(
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Bold
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = libro.titulo,
+                                    style = TextStyle(
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    modifier = Modifier.padding(bottom = 4.dp)
                                 )
-                            )
 
-                            Text(
-                                text = libro.autor.joinToString(", "),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 4.dp),
-                                style = TextStyle(
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Thin
+                                Text(
+                                    text = libro.autor.joinToString(", "),
+                                    style = TextStyle(
+                                        fontSize = 14.sp,
+                                        fontStyle = FontStyle.Italic,
+                                        color = Color.DarkGray
+                                    ),
+                                    modifier = Modifier.padding(bottom = 2.dp)
                                 )
-                            )
 
-                            Text(
-                                text = "Año: ${libro.anio}",
-                                modifier = Modifier.fillMaxWidth(),
-                                style = TextStyle(
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Thin
+                                Text(
+                                    text = "Año: ${libro.anio}",
+                                    style = TextStyle(fontSize = 13.sp)
                                 )
-                            )
+                            }
 
                             IconButton(
                                 onClick = {
                                     isLiked = !isLiked
                                     viewModel.likeLibro(libro)
-                                },
-                                modifier = Modifier
-                                    .align(Alignment.End)
-                                    .padding(top = 8.dp)
+                                }
                             ) {
                                 Icon(
                                     imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                                     contentDescription = "Me gusta",
-                                    tint = Color.Red
+                                    tint = if (isLiked) Color.Red else Color.Gray
                                 )
                             }
                         }
                     }
                 }
             } else {
-                // Si no hay libros, pero no hay error
                 if (errorState !is BookViewModel.BookState.Error) {
-                    Text("Esperando resultados de búsqueda o no se encontraron libros")
+                    Text(
+                        text = "Esperando resultados de búsqueda o no se encontraron libros",
+                        modifier = Modifier.padding(vertical = 16.dp),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
 
+            // Botón para ver favoritos
             OutlinedButton(
+                onClick = { viewModel.getLibros() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
-                onClick = { viewModel.getLibros() }
+                    .height(50.dp)
+                    .padding(top = 16.dp),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text("Ver lista de favoritos")
             }
 
+            // Mostrar error si existe
             if (errorState is BookViewModel.BookState.Error) {
                 val errorMessage = (errorState as BookViewModel.BookState.Error).message
                 Text(
                     text = "Error: $errorMessage",
                     color = Color.Red,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
                 )
             }
-
         }
     }
 }
