@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ucb.data.NetworkResult
 import com.ucb.domain.Book
-import com.ucb.ucbtest.movie.MovieViewModel.MovieUIState
 import com.ucb.usecases.book.Buscar
 import com.ucb.usecases.book.GetLikedBooks
 import com.ucb.usecases.book.LikeBook

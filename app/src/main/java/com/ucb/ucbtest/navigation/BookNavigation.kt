@@ -8,14 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.ucb.domain.Movie
 import com.ucb.ucbtest.book.BookUI
-import com.ucb.ucbtest.counter.CounterUI
-import com.ucb.ucbtest.gitalias.GitaliasUI
-import com.ucb.ucbtest.login.LoginUI
-import com.ucb.ucbtest.movie.MoviesUI
-import com.ucb.ucbtest.moviedetail.MovieDetailUI
-import com.ucb.ucbtest.takephoto.TakePhotoUI
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.net.URLDecoder
